@@ -6,8 +6,8 @@
 清单在**卡片、Web、Agent** 之间实时同步——记录不依赖手机电脑在场：
 卡片独立联网工作，断网时录音存本地、内容可回放，联网后自动补传识别。
 
-<!-- 截图：卡片堆叠 UI + Web 界面并排 -->
-![小诺简录](docs/images/hero.png)
+<!-- 实物：AI Passport 卡片上的小诺简录 -->
+![小诺简录](docs/images/hero.jpg)
 
 ## ✨ 特性
 
@@ -38,9 +38,17 @@
 
 ## 📸 界面
 
-| 卡片（固件） | Web 端 | 语音确认 |
+**卡片（AI Passport 实物）**
+
+| 堆叠卡片 | 按住说话（声波 + 计时） | 语音确认（分页查看） |
 |---|---|---|
-| ![卡片堆叠](docs/images/card-stack.png) | ![Web 界面](docs/images/web-ui.png) | ![语音确认](docs/images/card-confirm.png) |
+| ![堆叠卡片](docs/images/card-stack.jpg) | ![录音中](docs/images/card-recording.jpg) | ![语音确认](docs/images/card-confirm.jpg) |
+
+**Web 端与 Agent**
+
+| Web 卡片视图 | Web 列表视图 | Agent Skill |
+|---|---|---|
+| ![Web 卡片视图](docs/images/web-cards.png) | ![Web 列表视图](docs/images/web-table.png) | ![Agent Skill](docs/images/agent-skill.png) |
 
 ## 🏗 架构
 
