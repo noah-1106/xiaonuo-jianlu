@@ -6,7 +6,7 @@ MSG="${1:?用法: record.sh <自然语言>}"
 
 BODY="$(python3 -c 'import json,sys; print(json.dumps({"message": sys.argv[1]}))' "$MSG")"
 if ! RESP="$(curl -sf -X POST "$HUB/api/chat/send" -H 'Content-Type: application/json' -d "$BODY")"; then
-  echo "无法连接小诺简录中枢（$HUB）。请确认中枢已启动（cd hub && npm start），或检查 XIAONUO_HUB_URL。" >&2
+  echo "无法连接小诺简录中枢（${HUB}）。请确认中枢已启动（cd hub && npm start），或检查 XIAONUO_HUB_URL。" >&2
   exit 1
 fi
 

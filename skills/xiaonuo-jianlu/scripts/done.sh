@@ -6,7 +6,7 @@ ID="${1:?用法: done.sh <id> [status]}"
 STATUS="${2:-completed}"
 
 if ! RESP="$(curl -sf -X PUT "$HUB/api/records/$ID" -H 'Content-Type: application/json' -d "{\"status\": \"$STATUS\"}")"; then
-  echo "操作失败：中枢不可达（$HUB）或简录 $ID 不存在。" >&2
+  echo "操作失败：中枢不可达（${HUB}）或简录 $ID 不存在。" >&2
   exit 1
 fi
 
