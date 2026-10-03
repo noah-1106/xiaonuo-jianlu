@@ -28,7 +28,7 @@
 | `hub/` | 轻量中枢：API + ASR/LLM 适配 + SQLite 存储 |
 | `hub/web/` | Web 界面（React + antd，移植自 xiaonuo-assistant 的简录卡片页面），由中枢托管 |
 | `skills/xiaonuo-jianlu/` | Agent Skill：让任何 AI Agent 都能记录/查询/整理简录 |
-| 固件 | 独立仓库：[ai-passport](https://github.com/folotoy/ai-passport) 的 fork，`feature/xiaonuo-jianlu` 分支 |
+| 固件 | 独立仓库：[noah-1106/ai-passport](https://github.com/noah-1106/ai-passport/tree/feature/xiaonuo-jianlu)（folotoy/ai-passport 的 fork，`feature/xiaonuo-jianlu` 分支） |
 
 ## 快速开始
 
