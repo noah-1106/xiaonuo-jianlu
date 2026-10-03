@@ -7,6 +7,23 @@ const { callMockLLM } = require('./mock');
 
 const MAX_TOOL_ROUNDS = 5;
 
+// 把工具调用压成一行摘要，供写入对话上下文（如 createRecord「牙医复诊」#2; updateRecord #2 → completed）
+function summarizeToolCalls(toolCalls) {
+  return toolCalls.map((t) => {
+    const r = t.result && t.result.record;
+    if (r) {
+      const extras = [];
+      if (t.tool === 'createRecord') extras.push(`「${r.title}」`);
+      extras.push(`#${r.id}`);
+      if (t.tool === 'updateRecord') extras.push(`→ ${r.status}`);
+      if (t.tool === 'deleteRecord') extras.push('已删除');
+      return `${t.tool} ${extras.join(' ')}`;
+    }
+    if (t.result && Array.isArray(t.result.records)) return `${t.tool} ${t.result.records.length} 条`;
+    return t.tool;
+  }).join('; ');
+}
+
 function llmConfig() {
   const baseURL = (process.env.LLM_BASE_URL || '').replace(/\/+$/, '');
   return { baseURL, apiKey: process.env.LLM_API_KEY || '', model: process.env.LLM_MODEL || '' };
@@ -48,7 +65,9 @@ async function chat(userText) {
     if (!msg.tool_calls || msg.tool_calls.length === 0) {
       const reply = msg.content || '';
       db.saveMessage('user', userText);
-      db.saveMessage('assistant', reply);
+      // 上下文里同时记录工具执行摘要，否则后续轮次模型看不到自己做过什么，会对历史状态产生困惑
+      const note = toolCalls.length ? `\n\n[本轮已执行: ${summarizeToolCalls(toolCalls)}]` : '';
+      db.saveMessage('assistant', reply + note);
       return { reply, toolCalls };
     }
 

@@ -31,7 +31,7 @@ async function transcribe(audioBuffer, filename = 'audio.wav', mime = 'audio/wav
   }
   const data = await resp.json();
   const text = (data.text || '').trim();
-  if (!text) throw new Error('ASR 未识别出内容');
+  if (!text) throw new Error('没听清，请靠近一点大声些再试');
   return text;
 }
 
