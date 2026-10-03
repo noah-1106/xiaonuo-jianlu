@@ -50,8 +50,9 @@ async function callLLM(messages, tools) {
 }
 
 // 对话主管线：用户消息 → LLM + function calling 循环 → 最终回复
-async function chat(userText) {
-  const messages = [{ role: 'system', content: buildSystemPrompt() }];
+// opts.brief: 设备通道用短回复（小屏幕）
+async function chat(userText, opts = {}) {
+  const messages = [{ role: 'system', content: buildSystemPrompt(opts) }];
   messages.push(...db.loadRecentMessages(10));
   messages.push({ role: 'user', content: userText });
 
@@ -65,9 +66,9 @@ async function chat(userText) {
     if (!msg.tool_calls || msg.tool_calls.length === 0) {
       const reply = msg.content || '';
       db.saveMessage('user', userText);
-      // 上下文里同时记录工具执行摘要，否则后续轮次模型看不到自己做过什么，会对历史状态产生困惑
-      const note = toolCalls.length ? `\n\n[本轮已执行: ${summarizeToolCalls(toolCalls)}]` : '';
-      db.saveMessage('assistant', reply + note);
+      // 工具执行摘要单独存为 system 消息，否则模型会把"[本轮已执行]"当成自己的说话格式模仿
+      if (toolCalls.length) db.saveMessage('system', `[操作记录] ${summarizeToolCalls(toolCalls)}`);
+      db.saveMessage('assistant', reply);
       return { reply, toolCalls };
     }
 
