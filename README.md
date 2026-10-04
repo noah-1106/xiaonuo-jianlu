@@ -112,8 +112,21 @@ cp -R skills/xiaonuo-jianlu ~/.claude/skills/
 
 ### 卡片
 
-见固件仓库 [feature/xiaonuo-jianlu](https://github.com/noah-1106/ai-passport/tree/feature/xiaonuo-jianlu) 分支。
-刷入固件后：开机进配网模式 → EspBlufi App 下发 Wi-Fi → mDNS 自动发现中枢 → 开用。
+固件见 [feature/xiaonuo-jianlu](https://github.com/noah-1106/ai-passport/tree/feature/xiaonuo-jianlu) 分支（社区市场发布后可直接一键安装）。
+
+**首次使用：配网**（约 1 分钟，只需一次）
+
+1. 刷入固件开机，屏幕进入配网模式，显示设备名 `BLUFI_XIAONUO_XXXX`
+2. 手机安装 **EspBlufi** App（乐鑫官方，各大应用商店有售）
+3. App 中找到并连接你的卡片 → 点「配网」→ 输入家里的 Wi-Fi 名称和密码（仅 2.4GHz）→ 配置
+4. 卡片收到凭据自动重启（App 显示"已断开"是正常的）→ 自动连 Wi-Fi → **mDNS 自动发现同网络下的中枢** → 开用
+
+| 下载 App | 连接卡片 | 点击配网 | 输入 Wi-Fi |
+|---|---|---|---|
+| ![下载 EspBlufi](docs/images/prov-1-appstore.jpg) | ![连接卡片](docs/images/prov-2-open.jpg) | ![点击配网](docs/images/prov-3-connect.jpg) | ![输入 Wi-Fi](docs/images/prov-4-wifi.jpg) |
+
+> - 中枢发现依赖同一局域网；找不到时会显示出错页（可用 BLUFI 自定义数据 `hub=http://<中枢IP>:3000` 手动指定）
+> - 换 Wi-Fi：卡片上 **UP 长按** → 确认后重新进入配网模式
 
 ## 🔌 API
 
