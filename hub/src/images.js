@@ -5,7 +5,9 @@ const fs = require('fs');
 const { Jimp } = require('jimp');
 const { intToRGBA } = require('@jimp/utils');
 
-const dataDir = path.join(__dirname, '..', 'data');
+// 图片目录可配置（测试用独立目录，避免误删真实数据）
+const dataDir = process.env.IMAGES_DIR || path.join(__dirname, '..', 'data');
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 // 图片转 RGB565 原始像素（小端 uint16，卡片 LVGL 直接可用）
 async function toRgb565(img, size) {

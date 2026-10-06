@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const fs = require('fs');
 const multer = require('multer');
 const db = require('../db');
 const images = require('../images');
@@ -8,14 +9,18 @@ const images = require('../images');
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
-// GET /api/profile —— 卡片主页拉取
+// GET /api/profile —— 卡片主页拉取；图片带版本号(mtime ms)，卡片据此跳过重复下载
 router.get('/', (req, res) => {
   const p = db.getProfile();
+  const avatar = images.rawPath('avatar');
+  const qrcode = images.rawPath('qrcode');
   res.json({
     nickname: p.nickname,
     signature: p.signature,
-    hasAvatar: !!images.rawPath('avatar'),
-    hasQrcode: !!images.rawPath('qrcode'),
+    hasAvatar: !!avatar,
+    hasQrcode: !!qrcode,
+    avatarVersion: avatar ? fs.statSync(avatar).mtimeMs : 0,
+    qrcodeVersion: qrcode ? fs.statSync(qrcode).mtimeMs : 0,
   });
 });
 

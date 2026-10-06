@@ -8,6 +8,7 @@ const os = require('os');
 const path = require('path');
 
 process.env.MOCK_LLM = '1';
+process.env.IMAGES_DIR = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'xiaonuo-img-')), '');
 process.env.DB_PATH = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'xiaonuo-profile-')), 'test.db');
 
 const app = require('../src/app');
