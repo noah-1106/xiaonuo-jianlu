@@ -65,17 +65,31 @@ const ProfileSettings: React.FC<Props> = ({ open, onClose }) => {
         <div>
           <Text strong>头像</Text>
           <Text type="secondary" style={{ marginLeft: 8 }}>{profile?.hasAvatar ? '已设置' : '未设置（卡片显示昵称首字）'}</Text>
+          {profile?.hasAvatar && (
+            <div style={{ margin: '8px 0' }}>
+              <img src="/api/profile/avatar.preview.png" alt="头像预览" style={{ width: 96, height: 96, borderRadius: 8, border: '1px solid #e0e0e0' }} />
+              <div><Text type="secondary" style={{ fontSize: 12 }}>卡片上的效果预览</Text></div>
+            </div>
+          )}
           <Upload.Dragger accept="image/*" maxCount={1} showUploadList={false} beforeUpload={(f) => onUpload('avatar')(f)} style={{ marginTop: 8 }}>
             <p><InboxOutlined /></p>
-            <p>点击或拖入头像图片（会裁切成 96×96）</p>
+            <p>点击或拖入头像图片</p>
+            <p style={{ fontSize: 12 }}>建议正方形、清晰的脸部/形象特写（自动居中裁切为 96×96）</p>
           </Upload.Dragger>
         </div>
         <div>
           <Text strong>微信二维码</Text>
           <Text type="secondary" style={{ marginLeft: 8 }}>{profile?.hasQrcode ? '已设置' : '未设置'}</Text>
+          {profile?.hasQrcode && (
+            <div style={{ margin: '8px 0' }}>
+              <img src="/api/profile/qrcode.preview.png" alt="二维码预览" style={{ width: 176, height: 176, borderRadius: 8, border: '1px solid #e0e0e0' }} />
+              <div><Text type="secondary" style={{ fontSize: 12 }}>卡片上的效果预览（彩色二维码会保留颜色）</Text></div>
+            </div>
+          )}
           <Upload.Dragger accept="image/*" maxCount={1} showUploadList={false} beforeUpload={(f) => onUpload('qrcode')(f)} style={{ marginTop: 8 }}>
             <p><InboxOutlined /></p>
-            <p>点击或拖入微信二维码截图（微信 → 我 → 二维码名片）</p>
+            <p>点击或拖入微信二维码截图</p>
+            <p style={{ fontSize: 12 }}>微信 → 我 → 头像/二维码名片 → 保存；请截取完整方形区域，支持彩色样式（缩放为 176×176）</p>
           </Upload.Dragger>
         </div>
       </Space>

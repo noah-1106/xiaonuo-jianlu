@@ -43,6 +43,14 @@ router.get('/:kind(avatar|qrcode).raw', (req, res) => {
   res.sendFile(p);
 });
 
+// GET /api/profile/avatar.preview.png | qrcode.preview.png —— Web 端预览（即卡片上的呈现效果）
+router.get('/:kind(avatar|qrcode).preview.png', (req, res) => {
+  const p = images.previewPath(req.params.kind);
+  if (!p) return res.status(404).json({ error: '未设置' });
+  res.set('Content-Type', 'image/png');
+  res.sendFile(p);
+});
+
 // DELETE /api/profile/avatar | qrcode
 router.delete('/:kind(avatar|qrcode)', (req, res) => {
   images.deleteImage(req.params.kind);
