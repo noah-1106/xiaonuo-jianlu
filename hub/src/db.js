@@ -35,6 +35,14 @@ CREATE TABLE IF NOT EXISTS messages (
   content TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS profile (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  nickname TEXT NOT NULL DEFAULT '',
+  signature TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+INSERT OR IGNORE INTO profile (id) VALUES (1);
 `);
 
 const RECORD_TYPES = ['todo', 'article', 'inspiration', 'other'];
@@ -128,6 +136,17 @@ function saveMessage(role, content) {
   db.prepare('INSERT INTO messages (role, content) VALUES (?, ?)').run(role, content);
 }
 
+function getProfile() {
+  return db.prepare('SELECT nickname, signature, updated_at FROM profile WHERE id = 1').get();
+}
+
+function updateProfile({ nickname, signature }) {
+  if (nickname !== undefined) db.prepare('UPDATE profile SET nickname = ? WHERE id = 1').run(String(nickname).slice(0, 50));
+  if (signature !== undefined) db.prepare('UPDATE profile SET signature = ? WHERE id = 1').run(String(signature).slice(0, 100));
+  db.prepare("UPDATE profile SET updated_at = datetime('now') WHERE id = 1").run();
+  return getProfile();
+}
+
 function loadRecentMessages(limit = 10) {
   const rows = db.prepare('SELECT role, content FROM messages ORDER BY id DESC LIMIT ?').all(limit);
   return rows.reverse();
@@ -145,4 +164,6 @@ module.exports = {
   deleteRecord,
   saveMessage,
   loadRecentMessages,
+  getProfile,
+  updateProfile,
 };

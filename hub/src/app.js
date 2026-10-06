@@ -12,6 +12,7 @@ app.get('/api/health', (req, res) => res.json({ ok: true, name: 'xiaonuo-hub' })
 app.use('/api/records', require('./routes/records'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/device', require('./routes/device'));
+app.use('/api/profile', require('./routes/profile'));
 
 // MCP 端点：Agent 客户端配置一次 URL 即可常驻访问简录工具
 require('./mcp').mountMcp(app);

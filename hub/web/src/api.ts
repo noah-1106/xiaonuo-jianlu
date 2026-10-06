@@ -39,3 +39,29 @@ export const chatApi = {
   send: (message: string) =>
     request<ChatSendResult>('/chat/send', { method: 'POST', body: JSON.stringify({ message }) })
 }
+
+export interface Profile {
+  nickname: string
+  signature: string
+  hasAvatar: boolean
+  hasQrcode: boolean
+}
+
+async function uploadImage(kind: 'avatar' | 'qrcode', file: File): Promise<void> {
+  const form = new FormData()
+  form.append('image', file)
+  const res = await fetch(`${BASE}/profile/${kind}`, { method: 'POST', body: form })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error((data as any).error || `上传失败: ${res.status}`)
+  }
+}
+
+export const profileApi = {
+  get: () => request<Profile>('/profile'),
+  update: (data: { nickname?: string; signature?: string }) =>
+    request<{ profile: Profile }>('/profile', { method: 'PUT', body: JSON.stringify(data) }),
+  uploadAvatar: (file: File) => uploadImage('avatar', file),
+  uploadQrcode: (file: File) => uploadImage('qrcode', file),
+  // 图片预览：后端存的是 RGB565 原始像素，预览用原件缓存 bust 参数标记即可（此处直接不传预览，保持简单）
+}
