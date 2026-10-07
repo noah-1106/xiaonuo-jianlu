@@ -1,11 +1,27 @@
 'use strict';
 
+const net = require('net');
+
+// 连接级取证:记录每一个到达 3000 端口的 TCP 连接(来源IP/时刻/存活时长)
+const probe = net.createServer((socket) => {
+  console.log(`[connection] ${socket.remoteAddress}:${socket.remotePort} 到达 ${new Date().toISOString()}`);
+  socket.on('error', (e) => console.log(`[connection] ${socket.remoteAddress} 错误: ${e.message}`));
+});
+probe.listen(3001, () => console.log('[connection] 取证监听 :3001'));
+probe.unref();
+
 const app = require('./app');
 
 const port = Number(process.env.PORT) || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`小诺简录中枢已启动: http://localhost:${port}`);
   if (process.env.MOCK_LLM === '1') console.log('（MOCK_LLM=1，使用内置 mock 模型）');
+
+  // 连接级取证:每个到达业务端口的 TCP 连接都记录(定位卡片连接问题)
+  server.on('connection', (socket) => {
+    console.log(`[conn] ${socket.remoteAddress}:${socket.remotePort} → :${port} @${new Date().toISOString()}`);
+    socket.on('error', (e) => console.log(`[conn] ${socket.remoteAddress} 错误: ${e.message}`));
+  });
 
   // mDNS 广播：让卡片在局域网内自动发现中枢（_xiaonuo._tcp）
   // 优先用系统级 responder（完整实现 RFC 6762 §8.1 单播直答，ESP32 在部分路由器下收不到组播应答）：

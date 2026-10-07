@@ -7,6 +7,11 @@ const express = require('express');
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 
+// 请求日志:定位 Web 端上传问题(记录所有非 GET 请求)
+app.use((req, res, next) => {
+  if (req.method !== 'GET') console.log(`[req] ${req.method} ${req.url} ct=${req.headers['content-type'] || '-'} @${new Date().toISOString()}`);
+  next();
+});
 app.get('/api/health', (req, res) => res.json({ ok: true, name: 'xiaonuo-hub' }));
 
 app.use('/api/records', require('./routes/records'));
