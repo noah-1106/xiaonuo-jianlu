@@ -75,6 +75,10 @@ function onMessage(msg) {
   }
   // 未请求的通知
   if (msg.r === 'ready') onCardReady(msg);
+  else if (msg.c === 'sync') {
+    console.log('[桥] 卡片请求同步');
+    runSync();
+  }
   else console.log(`[桥] 未请求的通知: ${JSON.stringify(msg).slice(0, 100)}`);
 }
 
@@ -115,8 +119,11 @@ async function runSync() {
         method: 'POST', headers: { 'Content-Type': 'audio/wav' }, body: wav,
       });
       if (!resp.ok) {
-        console.log(`[桥] 槽 ${slot} 中枢 ${resp.status},保留待下轮`);
-        continue;   // 失败保留槽位,下轮再试,不阻断其余槽
+        // 中枢已应答=内容被判定无效(如静音),重试无意义,删除槽位
+        // (与 Wi-Fi 路径语义一致);仅网络层失败(fetch 抛异常)才保留重试
+        console.log(`[桥] 槽 ${slot} 中枢 ${resp.status}(内容被拒),删除槽位`);
+        await request({ c: 'vdel', slot }, ['r', 'ok']);
+        continue;
       }
       const result = await resp.json().catch(() => ({}));
       console.log(`[桥] 语音槽 ${slot}: ${pcm.length}B → ${JSON.stringify(result).slice(0, 80)}`);
