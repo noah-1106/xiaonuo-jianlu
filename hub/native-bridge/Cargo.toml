@@ -1,0 +1,16 @@
+[package]
+name = "xiaonuo-ble-relay"
+version = "1.0.0"
+edition = "2021"
+description = "小诺简录 BLE 直连中继:卡片 NUS ⇄ stdio(协议与业务在中枢 Node 侧)"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+btleplug = { version = "0.11", features = ["serde"] }
+futures = "0.3"
+uuid = "1"
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true

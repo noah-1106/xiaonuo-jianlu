@@ -1,0 +1,14 @@
+/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/deps/serde-08bde9f4a30a786f.d: /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs /Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/serde-121da328f8a26c51/out/private.rs
+
+/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/deps/libserde-08bde9f4a30a786f.rlib: /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs /Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/serde-121da328f8a26c51/out/private.rs
+
+/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/deps/libserde-08bde9f4a30a786f.rmeta: /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs /Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/serde-121da328f8a26c51/out/private.rs
+
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs:
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs:
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs:
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs:
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs:
+/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/serde-121da328f8a26c51/out/private.rs:
+
+# env-dep:OUT_DIR=/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/serde-121da328f8a26c51/out

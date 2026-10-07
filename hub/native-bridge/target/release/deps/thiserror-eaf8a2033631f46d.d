@@ -1,0 +1,14 @@
+/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/deps/thiserror-eaf8a2033631f46d.d: /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/lib.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/aserror.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/display.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/var.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/private.rs /Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/thiserror-10d8559c6b811830/out/private.rs
+
+/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/deps/libthiserror-eaf8a2033631f46d.rlib: /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/lib.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/aserror.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/display.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/var.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/private.rs /Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/thiserror-10d8559c6b811830/out/private.rs
+
+/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/deps/libthiserror-eaf8a2033631f46d.rmeta: /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/lib.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/aserror.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/display.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/var.rs /Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/private.rs /Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/thiserror-10d8559c6b811830/out/private.rs
+
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/lib.rs:
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/aserror.rs:
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/display.rs:
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/var.rs:
+/Users/tannoah/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/private.rs:
+/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/thiserror-10d8559c6b811830/out/private.rs:
+
+# env-dep:OUT_DIR=/Users/tannoah/Project/xiaonuo/hub/native-bridge/target/release/build/thiserror-10d8559c6b811830/out
