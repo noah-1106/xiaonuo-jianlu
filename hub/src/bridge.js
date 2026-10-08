@@ -190,7 +190,50 @@ function wavFromPcm(pcm) {
 function onCardReady(msg) {
   state.connected = true;
   console.log(`[桥] 卡片就绪: 清单 ${msg.cnt} 条`);
-  runSync();
+  pushMeta().then(() => runSync());
+}
+
+// ---- 元数据推送：时间 / 昵称签名 / 头像二维码（版本未变则跳过图片）----
+const fsSync = require('fs');
+const imgVerPath = path.join(__dirname, '..', 'data', 'ble-img-version.json');
+const IMG_RAW_CHUNK = 1024;   // 1024B → 1368 b64 字符,卡片单块解码上限 1400B
+
+function loadImgVer() {
+  try { return JSON.parse(fsSync.readFileSync(imgVerPath, 'utf8')); } catch { return {}; }
+}
+function saveImgVer(v) {
+  try { fsSync.writeFileSync(imgVerPath, JSON.stringify(v)); } catch {}
+}
+
+async function pushMeta() {
+  const hub = `http://localhost:${process.env.PORT || 3000}`;
+  try {
+    // 1) 对时(直连态时钟来源)
+    send({ c: 'time', epoch: Math.floor(Date.now() / 1000) });
+    // 2) 资料
+    const prof = await fetch(`${hub}/api/profile`).then((r) => r.json());
+    send({ c: 'profile', nickname: prof.nickname || '', signature: prof.signature || '' });
+    // 3) 图片(版本未变跳过)
+    const last = loadImgVer();
+    for (const kind of ['avatar', 'qrcode']) {
+      const ver = kind === 'avatar' ? prof.avatarVersion : prof.qrcodeVersion;
+      const has = kind === 'avatar' ? prof.hasAvatar : prof.hasQrcode;
+      if (!has) continue;
+      if (ver && ver === last[kind]) continue;
+      const buf = Buffer.from(await fetch(`${hub}/api/profile/${kind}.raw`).then((r) => r.arrayBuffer()));
+      const total = Math.ceil(buf.length / IMG_RAW_CHUNK);
+      send({ c: 'imgb', kind, total });
+      for (let i = 0; i < total; i++) {
+        send({ c: 'imgc', kind, seq: i, data: buf.subarray(i * IMG_RAW_CHUNK, (i + 1) * IMG_RAW_CHUNK).toString('base64') });
+        await new Promise((r) => setTimeout(r, 30));   // 写入分片带响应,轻节流
+      }
+      last[kind] = ver;
+      console.log(`[桥] 图片推送: ${kind} ${buf.length}B/${total} 块`);
+    }
+    saveImgVer(last);
+  } catch (e) {
+    console.log(`[桥] 元数据推送失败(不影响同步): ${e.message}`);
+  }
 }
 
 // ---------- 中继生命周期 ----------
