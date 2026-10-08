@@ -223,12 +223,19 @@ async function pushMeta() {
       const buf = Buffer.from(await fetch(`${hub}/api/profile/${kind}.raw`).then((r) => r.arrayBuffer()));
       const total = Math.ceil(buf.length / IMG_RAW_CHUNK);
       send({ c: 'imgb', kind, total });
+      await new Promise((r) => setTimeout(r, 100));
       for (let i = 0; i < total; i++) {
-        send({ c: 'imgc', kind, seq: i, data: buf.subarray(i * IMG_RAW_CHUNK, (i + 1) * IMG_RAW_CHUNK).toString('base64') });
-        await new Promise((r) => setTimeout(r, 30));   // 写入分片带响应,轻节流
+        const line = { c: 'imgc', kind, seq: i, data: buf.subarray(i * IMG_RAW_CHUNK, (i + 1) * IMG_RAW_CHUNK).toString('base64') };
+        if (i < total - 1) {
+          send(line);
+          await new Promise((r) => setTimeout(r, 30));   // 写入分片带响应,轻节流
+        } else {
+          // 最后一块带等待:卡片收齐返回 ok 才记版本,杜绝"假完成"
+          await request(line, ['r', 'ok'], 15000);
+        }
       }
       last[kind] = ver;
-      console.log(`[桥] 图片推送: ${kind} ${buf.length}B/${total} 块`);
+      console.log(`[桥] 图片推送: ${kind} ${buf.length}B/${total} 块(已确认)`);
     }
     saveImgVer(last);
   } catch (e) {
