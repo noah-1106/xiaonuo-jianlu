@@ -3,7 +3,8 @@
 // 全在中枢 Node 侧(src/bridge.js)——保持单一实现。
 //
 // 行为:
-//   stdout = 卡片 NUS TX 通知的原始字节(按 \n 重组 JSON 行由 Node 负责)
+//   stdout = 卡片 NUS TX 通知的原始字节(按 \n 重组 JSON 行由 Node 负责);
+//            会话断开时中继自己补发一行 {"r":"bye"}
 //   stdin  = Node 写入的 JSON 行(本程序按 128B 分片、带响应写入 NUS RX)
 //   stderr = 运行日志(连接/断开/重扫)
 // 断线自动重扫 XIAONUO_ 前缀设备,永久运行直至 stdin 关闭或被 kill。
@@ -87,9 +88,10 @@ async fn writer_task(
     while let Some(line) = rx.recv().await {
         log(&format!("写 {} 字节", line.len()));
         for chunk in line.chunks(CHUNK) {
-            // 带响应写:不带响应会被 macOS CoreBluetooth 流控静默丢弃(E2E 实测)
+            // 带响应写:不带响应会被 macOS CoreBluetooth 流控静默丢弃(E2E 实测),
+            // 且逐片 ACK 提供天然流控(卡片 NimBLE 收片缓冲有限)
             if let Err(e) = peripheral
-                .write(&find_char(&peripheral, NUS_RX, CharPropFlags::WRITE | CharPropFlags::WRITE_WITHOUT_RESPONSE).expect("NUS RX 消失"), chunk, WriteType::WithoutResponse)
+                .write(&find_char(&peripheral, NUS_RX, CharPropFlags::WRITE | CharPropFlags::WRITE_WITHOUT_RESPONSE).expect("NUS RX 消失"), chunk, WriteType::WithResponse)
                 .await
             {
                 log(&format!("写入失败: {e:?}"));
@@ -118,9 +120,10 @@ async fn main() {
                     Ok(n) => {
                         buf.extend_from_slice(&chunk[..n]);
                         while let Some(pos) = buf.iter().position(|&b| b == b'\n') {
-                            let mut line: Vec<u8> = buf.drain(..=pos).collect();
-                            line.pop(); // 去掉 \n
-                            if line.is_empty() { continue; }
+                            // 保留 \n:卡片按行终止符组帧分发,剥掉换行会
+                            // 让行缓冲永远攒不满,整条命令无声丢失
+                            let line: Vec<u8> = buf.drain(..=pos).collect();
+                            if line.len() <= 1 { continue; }
                             // 无会话时丢弃输入(卡片未连接,业务层自会重试)
                             if let Some(tx) = current_tx.blocking_lock().as_ref() {
                                 let _ = tx.try_send(line);
@@ -144,6 +147,12 @@ async fn main() {
             Err(e) => log(&format!("会话结束: {e}")),
         }
         *current_tx.lock().await = None;
+        // 告知 Node 侧卡片已断开(否则桥的 connected 状态僵死为 true)
+        {
+            let mut out = tokio::io::stdout();
+            let _ = out.write_all(b"{\"r\":\"bye\"}\n").await;
+            let _ = out.flush().await;
+        }
         log(&format!("重扫 {addr} ..."));
         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
     }
@@ -170,23 +179,32 @@ async fn run_session(card: Peripheral, rx: mpsc::Receiver<Vec<u8>>) -> Result<()
     card.subscribe(&tx_char).await.map_err(|e| format!("订阅失败: {e:?}"))?;
     log("已连接并订阅,开始转发");
 
-    let writer = tokio::spawn(writer_task(card.clone(), rx));
+    let mut writer = tokio::spawn(writer_task(card.clone(), rx));
 
+    // 会话活性:通知到达即刷新。卡片直连态每 15s 发 {"r":"hb"} 心跳。
+    // 卡片重启后 CoreBluetooth 状态不可靠(is_connected 假阳性和调用僵死
+    // 都实测见过),所以 45s 无通知的判定放在主 select 里做——不经过任何
+    // CoreBluetooth 调用,不会随之僵死。
+    let last_rx = std::sync::Arc::new(std::sync::Mutex::new(std::time::Instant::now()));
     let session_card = card.clone();
     let mut watcher = tokio::spawn(async move {
         loop {
-            if !session_card.is_connected().await.unwrap_or(true) {
+            // 断线后查询可能返回 Err(外设已消失),必须按断开处理:
+            // unwrap_or(true) 会让会话僵死(卡片重启实测不复连)
+            if !session_card.is_connected().await.unwrap_or(false) {
                 return;
             }
             tokio::time::sleep(std::time::Duration::from_secs(2)).await;
         }
     });
 
+    let mut hb = tokio::time::interval(std::time::Duration::from_secs(5));
     let mut out = tokio::io::stdout();
     let result: Result<(), String> = loop {
         tokio::select! {
             n = notifications.next() => match n {
                 Some(data) => {
+                    *last_rx.lock().unwrap() = std::time::Instant::now();
                     if out.write_all(&data.value).await.is_err() {
                         break Err("stdout 关闭".into());
                     }
@@ -194,11 +212,29 @@ async fn run_session(card: Peripheral, rx: mpsc::Receiver<Vec<u8>>) -> Result<()
                 }
                 None => break Err("通知流结束(断线)".into()),
             },
+            _ = hb.tick() => {
+                if last_rx.lock().unwrap().elapsed()
+                    > std::time::Duration::from_secs(45)
+                {
+                    break Err("45s 无通知(心跳丢失),判定会话死亡".into());
+                }
+            }
             _ = &mut watcher => break Err("连接已断开".into()),
+            w = &mut writer => break Err(format!("写入任务结束: {w:?}")),
         }
     };
     writer.abort();
-    let _ = card.unsubscribe(&tx_char).await;
-    let _ = card.disconnect().await;
+    // 清理:心跳丢失说明 CoreBluetooth 已僵死,unsubscribe/disconnect
+    // 会永不返回(实测整个会话卡死在这里)。给 3s;超时直接退出进程——
+    // 中枢 5s 后自动重启中继,全新进程的 CoreBluetooth 会话是干净的,
+    // 重扫必能连上;留在原进程重扫则会被僵尸连接挡住。
+    let cleanup = async {
+        let _ = card.unsubscribe(&tx_char).await;
+        let _ = card.disconnect().await;
+    };
+    if tokio::time::timeout(std::time::Duration::from_secs(3), cleanup).await.is_err() {
+        log("清理超时(CoreBluetooth 僵死),退出进程由中枢拉起新中继");
+        std::process::exit(1);
+    }
     result
 }

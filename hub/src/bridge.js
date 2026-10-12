@@ -38,7 +38,6 @@ function relayBinary() {
 }
 
 // ---------- 协议层 ----------
-const lineBuf = Buffer.alloc(0);
 const waiters = [];      // {want, resolve, reject, timer}
 const feeders = [];      // (msg) => bool,语音分块收集
 
@@ -74,7 +73,12 @@ function onMessage(msg) {
     }
   }
   // 未请求的通知
-  if (msg.r === 'ready') onCardReady(msg);
+  if (msg.r === 'hb') { /* 心跳:中继侧的会话活性看门狗用,业务忽略 */ }
+  else if (msg.r === 'ready') onCardReady(msg);
+  else if (msg.r === 'bye') {
+    state.connected = false;   // 中继补发的断线通知(否则状态僵死在 connected)
+    console.log('[桥] 卡片已断开');
+  }
   else if (msg.c === 'sync') {
     console.log('[桥] 卡片请求同步');
     runSync();
@@ -82,7 +86,7 @@ function onMessage(msg) {
   else console.log(`[桥] 未请求的通知: ${JSON.stringify(msg).slice(0, 100)}`);
 }
 
-// ---------- 同步流程(与原 ble-bridge.py 等价) ----------
+// ---------- 同步流程 ----------
 async function runSync() {
   if (state.syncing) return;
   state.syncing = true;
@@ -252,6 +256,15 @@ function startBridge(app) {
     return;
   }
   spawnRelay(bin);
+  // 中枢退出必须带走中继:孤儿中继会占住卡片的 BLE 连接,新实例永远扫不到
+  const killRelay = () => {
+    if (state.restartTimer) clearTimeout(state.restartTimer);
+    if (state.relay) state.relay.kill('SIGTERM');
+  };
+  process.once('exit', killRelay);
+  for (const sig of ['SIGINT', 'SIGTERM']) {
+    process.once(sig, () => { killRelay(); process.exit(130); });
+  }
   // 状态端点
   app.get('/api/bridge/status', (req, res) => {
     res.json({ running: !!state.relay, connected: state.connected,
