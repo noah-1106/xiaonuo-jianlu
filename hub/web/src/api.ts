@@ -45,6 +45,8 @@ export interface Profile {
   signature: string
   hasAvatar: boolean
   hasQrcode: boolean
+  avatarVersion: number
+  qrcodeVersion: number
 }
 
 async function uploadImage(kind: 'avatar' | 'qrcode', file: File): Promise<void> {
@@ -63,5 +65,5 @@ export const profileApi = {
     request<{ profile: Profile }>('/profile', { method: 'PUT', body: JSON.stringify(data) }),
   uploadAvatar: (file: File) => uploadImage('avatar', file),
   uploadQrcode: (file: File) => uploadImage('qrcode', file),
-  // 图片预览：后端存的是 RGB565 原始像素，预览用原件缓存 bust 参数标记即可（此处直接不传预览，保持简单）
+  // 图片预览：前端用 avatarVersion/qrcodeVersion 作 ?v= cache-bust（见 ProfileSettings）
 }

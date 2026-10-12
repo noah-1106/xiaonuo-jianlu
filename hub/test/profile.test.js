@@ -23,7 +23,7 @@ before(async () => {
       resolve();
     });
   });
-  // 图片写盘目录跟随 DB_PATH 之外，用 hub/data——测试后清理
+  // 图片写盘目录由 IMAGES_DIR 隔离(见文件头),测试后清理
 });
 
 after(() => server.close());
@@ -39,6 +39,11 @@ test('资料读写', async () => {
     body: JSON.stringify({ nickname: '陈一诺', signature: '随时记录' }),
   }).then((r) => r.json());
   assert.strictEqual(updated.profile.nickname, '陈一诺');
+  // PUT 响应必须与 GET 同契约(Web 保存后直接用它刷新预览状态)
+  assert.strictEqual(updated.profile.hasAvatar, false);
+  assert.strictEqual(updated.profile.hasQrcode, false);
+  assert.strictEqual(typeof updated.profile.avatarVersion, 'number');
+  assert.strictEqual(typeof updated.profile.qrcodeVersion, 'number');
 
   const got = await fetch(`${base}/api/profile`).then((r) => r.json());
   assert.strictEqual(got.signature, '随时记录');
@@ -60,6 +65,11 @@ test('头像上传生成 96×96 RGB565 并可下载', async () => {
   assert.strictEqual(raw.status, 200);
   const buf = await raw.arrayBuffer();
   assert.strictEqual(buf.byteLength, 96 * 96 * 2);
+
+  // Web 预览端点
+  const preview = await fetch(`${base}/api/profile/avatar.preview.png`);
+  assert.strictEqual(preview.status, 200);
+  assert.strictEqual(preview.headers.get('content-type'), 'image/png');
 
   const profile = await fetch(`${base}/api/profile`).then((r) => r.json());
   assert.strictEqual(profile.hasAvatar, true);

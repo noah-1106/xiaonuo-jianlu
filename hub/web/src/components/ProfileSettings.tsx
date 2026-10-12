@@ -67,7 +67,7 @@ const ProfileSettings: React.FC<Props> = ({ open, onClose }) => {
           <Text type="secondary" style={{ marginLeft: 8 }}>{profile?.hasAvatar ? '已设置' : '未设置（卡片显示昵称首字）'}</Text>
           {profile?.hasAvatar && (
             <div style={{ margin: '8px 0' }}>
-              <img src="/api/profile/avatar.preview.png" alt="头像预览" style={{ width: 96, height: 96, borderRadius: 8, border: '1px solid #e0e0e0' }} />
+              <img src={`/api/profile/avatar.preview.png?v=${profile.avatarVersion}`} alt="头像预览" style={{ width: 96, height: 96, borderRadius: 8, border: '1px solid #e0e0e0' }} />
               <div><Text type="secondary" style={{ fontSize: 12 }}>卡片上的效果预览</Text></div>
             </div>
           )}
@@ -82,7 +82,7 @@ const ProfileSettings: React.FC<Props> = ({ open, onClose }) => {
           <Text type="secondary" style={{ marginLeft: 8 }}>{profile?.hasQrcode ? '已设置' : '未设置'}</Text>
           {profile?.hasQrcode && (
             <div style={{ margin: '8px 0' }}>
-              <img src="/api/profile/qrcode.preview.png" alt="二维码预览" style={{ width: 176, height: 176, borderRadius: 8, border: '1px solid #e0e0e0' }} />
+              <img src={`/api/profile/qrcode.preview.png?v=${profile.qrcodeVersion}`} alt="二维码预览" style={{ width: 176, height: 176, borderRadius: 8, border: '1px solid #e0e0e0' }} />
               <div><Text type="secondary" style={{ fontSize: 12 }}>卡片上的效果预览（彩色二维码会保留颜色）</Text></div>
             </div>
           )}

@@ -9,24 +9,30 @@ const images = require('../images');
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
-// GET /api/profile —— 卡片主页拉取；图片带版本号(mtime ms)，卡片据此跳过重复下载
-router.get('/', (req, res) => {
+// 统一载荷:GET/PUT 共用,保证两端契约一致(缺 hasAvatar 曾致 Web 保存后预览消失)
+function profilePayload() {
   const p = db.getProfile();
   const avatar = images.rawPath('avatar');
   const qrcode = images.rawPath('qrcode');
-  res.json({
+  return {
     nickname: p.nickname,
     signature: p.signature,
     hasAvatar: !!avatar,
     hasQrcode: !!qrcode,
     avatarVersion: avatar ? fs.statSync(avatar).mtimeMs : 0,
     qrcodeVersion: qrcode ? fs.statSync(qrcode).mtimeMs : 0,
-  });
+  };
+}
+
+// GET /api/profile —— 卡片主页拉取；图片带版本号(mtime ms)，卡片据此跳过重复下载
+router.get('/', (req, res) => {
+  res.json(profilePayload());
 });
 
 // PUT /api/profile {nickname, signature}
 router.put('/', (req, res) => {
-  res.json({ profile: db.updateProfile(req.body || {}) });
+  db.updateProfile(req.body || {});
+  res.json({ profile: profilePayload() });
 });
 
 // POST /api/profile/avatar | /api/profile/qrcode（multipart 图片上传）
