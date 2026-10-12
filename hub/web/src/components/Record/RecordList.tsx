@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { Table, Button, Tag, Space, Tooltip, Form, Select, DatePicker, Input, Row, Col, Spin } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
 import { TableOutlined, AppstoreOutlined, SearchOutlined } from '@ant-design/icons'
 import { useRecord } from '../../contexts/RecordContext'
 import { useRecordType } from '../../contexts/RecordTypeContext'
@@ -28,7 +29,6 @@ const RecordList: React.FC = () => {
   })
   const [form] = Form.useForm()
   const [filterValues, setFilterValues] = useState<FilterValues>({})
-  const [isFiltering, setIsFiltering] = useState(false)
   const [userTypes, setUserTypes] = useState<string[]>([])
   const [userTags, setUserTags] = useState<string[]>([])
 
@@ -140,7 +140,7 @@ const RecordList: React.FC = () => {
   }, [filteredRecords, pagination])
 
   // 表格列配置
-  const columns = [
+  const columns: ColumnsType<RecordItem> = [
     {
       title: '标题',
       dataIndex: 'title',
@@ -408,14 +408,11 @@ const RecordList: React.FC = () => {
               overflow: 'hidden',
               transition: 'all 0.3s ease'
             }}
-            rowStyle={{
-              height: 'auto',
-              minHeight: '80px',
-              borderBottom: '1px solid var(--theme-border)',
-              transition: 'all 0.3s ease'
-            }}
             onRow={(record) => ({
               style: {
+                height: 'auto',
+                minHeight: '80px',
+                borderBottom: '1px solid var(--theme-border)',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease-in-out',
                 transform: 'translateY(0)',

@@ -13,8 +13,6 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 const rawAudio = express.raw({ type: ['audio/*', 'application/octet-stream'], limit: 5 * 1024 * 1024 });
 
-const MIME_BY_EXT = { '.wav': 'audio/wav', '.mp3': 'audio/mpeg', '.m4a': 'audio/mp4', '.ogg': 'audio/ogg', '.opus': 'audio/opus', '.webm': 'audio/webm' };
-
 // 卡片小屏适配：去 emoji/markdown、压空白、超长截断（模型不一定守规矩，服务端做确定性兜底）
 const CARD_REPLY_MAX = 50;
 function sanitizeForCard(text) {

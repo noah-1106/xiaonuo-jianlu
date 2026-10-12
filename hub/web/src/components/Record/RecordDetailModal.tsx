@@ -427,7 +427,7 @@ const RecordDetailModal: React.FC<RecordDetailModalProps> = ({ visible, onCancel
                       setTagInputValue(inputValue)
                     }
                   }}
-                  onKeyPress={(e) => {
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault()
                       const inputValue = tagInputValue.trim()
